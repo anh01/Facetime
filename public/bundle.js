@@ -16571,6 +16571,8 @@ function config (name) {
 
 const SimplePeer = __webpack_require__(15);
 const $ = __webpack_require__(14);
+const openCamera = __webpack_require__(33);
+const playFriendStream = __webpack_require__(34);
 
 const initOption = { initiator: location.hash === '#1', trickle: false };// eslint-disable-line
 
@@ -16581,9 +16583,24 @@ $('document').ready(() => {
     $('#btnGetText').click(() => {
         const id = $('#txtFriendId').val();
         const obj = JSON.parse(id);
-        console.log(obj);
-    });   
+        peer.signal(obj);
+    });  
+
+    $('#btnSend').click(() => {
+        peer.send(Math.random());
+    }); 
+    
+    $('#btnOpenCamera').click(() => openCamera());
+
+    peer.on('connect', () => console.log('CONNECTED'));
+
+    peer.on('data', (data) => {
+        console.log(`data: ${data}`);
+    });
+
+    peer.on('stream', playFriendStream);
 });
+
 
 
 /***/ }),
@@ -17065,6 +17082,48 @@ exports.clearImmediate = clearImmediate;
 /***/ (function(module, exports) {
 
 /* (ignored) */
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const playMyVideo = __webpack_require__(35);
+
+const openCamera = () => (
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })// eslint-disable-line
+    .then(stream => {
+        playMyVideo(stream);
+        return stream;
+    })
+);
+module.exports = openCamera;
+
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports) {
+
+const playFriendStream = (stream) => {
+    const video = document.querySelectorAll('video')[1];// eslint-disable-line
+    video.src = window.URL.createObjectURL(stream);// eslint-disable-line
+    video.play();
+};
+
+module.exports = playFriendStream;
+
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports) {
+
+const playMyStream = (stream) => {
+    const video = document.querySelectorAll('video')[1];// eslint-disable-line
+    video.src = window.URL.createObjectURL(stream);// eslint-disable-line
+    video.play();
+};
+
+module.exports = playMyStream;
+
 
 /***/ })
 /******/ ]);
