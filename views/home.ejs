@@ -1,25 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>Khoa Pham Chat</title>
-        <script src="bundle.js"></script>
-        <style>
-            hr {
-                visibility: hidden;
-            }
-        </style>
-    </head>
-    <body>
-        <p id="p-signal" style="font-size: 4px"></p>
-        <textarea rows="3" cols="" placeholder="Enter your friend id" id="txtFriendId"></textarea>
-        <hr />
-        <button id="btnGetText">Connect</button>
-        <button id="btnSend">Send</button>
-        <button id="btnOpenCamera">Open Camera</button>
-        <hr />
-        <p>My video</p>
-        <video id="me" height="200" width="200px"></video>
-        <p>My friend video</p>
-        <video id="me2" height="200" width="200px"></video>
-    </body>
+
+<head>
+    <title>Khoa Pham Chat</title>
+    <script src="bundle.js"></script>
+    <style>
+        hr {
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <p>My video</p>
+    <video id="me" height="200" width="200px"></video>
+    <p>My friend video</p>
+    <video id="me2" height="200" width="200px"></video>
+    <ul id="ul-socket-id">
+
+    </ul>
+</body>
+
 </html>

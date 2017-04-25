@@ -1,27 +1,16 @@
 const $ = require('jquery');
-const openCamera = require('./openCamera');
-const createPeer = require('./createPeer');
-const setOnClick = require('./setOnClick');
-const playFriendStream = require('./playFriendStream');
+const io = require('socket.io-client');
+const handleList = require('./new/socketListHandle');
+const call = require('./new/call');
 
 $('document').ready(() => {
-    $('#btnOpenCamera').click(() => {
-        openCamera()
-        .then(stream => {
-            const peer = createPeer(stream);
-            setOnClick(peer);
-            peer.on('signal', data => $('#p-signal').html(JSON.stringify(data)));
-            peer.on('connect', () => console.log('CONNECTED'));
-            peer.on('data', (data) => {
-                console.log(`data: ${data}`);
-            });
-            peer.on('stream', playFriendStream);
-        });
+    const socket = io();
+    handleList(socket);// Handle list event, add remove render socket id
+
+    $('#ul-socket-id').on('click', 'li', function () {
+        const id = $(this).text();
+        call(socket, id);
     });
+
+    socket.on('SOMEONE_CALL', signal => console.log(JSON.stringify(signal)));
 });
-
-// peer.on('data', (data) => {
-//     console.log(`data: ${data}`);
-// });
-
-// peer.on('stream', playFriendStream);
