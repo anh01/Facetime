@@ -26,7 +26,11 @@ io.on('connection', socket => {
     });
     socket.on('CALL_OTHER', (data) => {
         const { idReceiver, signal } = data;
-        socket.broadcast.to(idReceiver).emit('SOMEONE_CALL', signal);
-        console.log(`A CALL REQUEST RECEIVED: ${idReceiver}`);
+        socket.broadcast.to(idReceiver).emit('SOMEONE_CALL', { senderSignal: signal, senderId: socket.id });
+    });
+
+    socket.on('ACCEPT_CALL', data => {
+        const { receiverId, signal } = data;
+        socket.broadcast.to(receiverId).emit('ACCEPT_SIGNAL', signal);
     });
 });

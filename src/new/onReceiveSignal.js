@@ -1,18 +1,16 @@
 const openCamera = require('./openCamera');
-const createPeer = require('./createPeer');
+const createReceivePeer = require('./createReceivePeer');
 const playFriendVideo = require('./playFriendVideo');
 
-const call = (socket, idReceiver) => {
+const onReceiveSignal = (socket, data) => {
+    const { senderSignal, senderId } = data;
     openCamera()
     .then(stream => {
-        const peer = createPeer(stream);
+        const peer = createReceivePeer(stream);
+        peer.signal(senderSignal);
         peer.on('signal', signal => {
-            console.log('idReceiver === ', idReceiver);
-            socket.emit('CALL_OTHER', { idReceiver, signal });
+            socket.emit('ACCEPT_CALL', { receiverId: senderId, signal });
         });
-
-        socket.on('ACCEPT_SIGNAL', signal => peer.signal(signal));
-
         peer.on('stream', friendStream => {
             console.log('GOT AN STREAM HERE');
             playFriendVideo(friendStream);
@@ -20,6 +18,6 @@ const call = (socket, idReceiver) => {
     });
 };
 
-module.exports = call;
+module.exports = onReceiveSignal;
 
 // socket.emit('CALL_OTHER', idReceiver);

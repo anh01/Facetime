@@ -16573,6 +16573,7 @@ const $ = __webpack_require__(14);
 const io = __webpack_require__(58);
 const handleList = __webpack_require__(87);
 const call = __webpack_require__(89);
+const onReceiveSignal = __webpack_require__(93);
 
 $('document').ready(() => {
     const socket = io();
@@ -16583,7 +16584,7 @@ $('document').ready(() => {
         call(socket, id);
     });
 
-    socket.on('SOMEONE_CALL', signal => console.log(JSON.stringify(signal)));
+    socket.on('SOMEONE_CALL', data => onReceiveSignal(socket, data));
 });
 
 
@@ -24932,6 +24933,7 @@ module.exports = handleList;
 
 const openCamera = __webpack_require__(90);
 const createPeer = __webpack_require__(92);
+const playFriendVideo = __webpack_require__(95);
 
 const call = (socket, idReceiver) => {
     openCamera()
@@ -24940,6 +24942,13 @@ const call = (socket, idReceiver) => {
         peer.on('signal', signal => {
             console.log('idReceiver === ', idReceiver);
             socket.emit('CALL_OTHER', { idReceiver, signal });
+        });
+
+        socket.on('ACCEPT_SIGNAL', signal => peer.signal(signal));
+
+        peer.on('stream', friendStream => {
+            console.log('GOT AN STREAM HERE');
+            playFriendVideo(friendStream);
         });
     });
 };
@@ -24990,6 +24999,62 @@ const createPeer = stream => {
 };
 
 module.exports = createPeer;
+
+
+/***/ }),
+/* 93 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const openCamera = __webpack_require__(90);
+const createReceivePeer = __webpack_require__(94);
+const playFriendVideo = __webpack_require__(95);
+
+const onReceiveSignal = (socket, data) => {
+    const { senderSignal, senderId } = data;
+    openCamera()
+    .then(stream => {
+        const peer = createReceivePeer(stream);
+        peer.signal(senderSignal);
+        peer.on('signal', signal => {
+            socket.emit('ACCEPT_CALL', { receiverId: senderId, signal });
+        });
+        peer.on('stream', friendStream => {
+            console.log('GOT AN STREAM HERE');
+            playFriendVideo(friendStream);
+        });
+    });
+};
+
+module.exports = onReceiveSignal;
+
+// socket.emit('CALL_OTHER', idReceiver);
+
+
+/***/ }),
+/* 94 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const SimplePeer = __webpack_require__(15);
+
+const createPeer = stream => {
+    const initOption = { initiator: false, trickle: false, stream };// eslint-disable-line
+    return new SimplePeer(initOption);
+};
+
+module.exports = createPeer;
+
+
+/***/ }),
+/* 95 */
+/***/ (function(module, exports) {
+
+const playFriendVideo = (stream) => {
+    const video = document.querySelectorAll('video')[1];// eslint-disable-line
+    video.src = window.URL.createObjectURL(stream);// eslint-disable-line
+    video.play();
+};
+
+module.exports = playFriendVideo;
 
 
 /***/ })

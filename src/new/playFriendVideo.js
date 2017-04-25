@@ -1,7 +1,7 @@
-const playFriendStream = (stream) => {
+const playFriendVideo = (stream) => {
     const video = document.querySelectorAll('video')[1];// eslint-disable-line
     video.src = window.URL.createObjectURL(stream);// eslint-disable-line
     video.play();
 };
 
-module.exports = playFriendStream;
+module.exports = playFriendVideo;

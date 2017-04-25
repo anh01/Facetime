@@ -2,6 +2,7 @@ const $ = require('jquery');
 const io = require('socket.io-client');
 const handleList = require('./new/socketListHandle');
 const call = require('./new/call');
+const onReceiveSignal = require('./new/onReceiveSignal');
 
 $('document').ready(() => {
     const socket = io();
@@ -12,5 +13,5 @@ $('document').ready(() => {
         call(socket, id);
     });
 
-    socket.on('SOMEONE_CALL', signal => console.log(JSON.stringify(signal)));
+    socket.on('SOMEONE_CALL', data => onReceiveSignal(socket, data));
 });
