@@ -16569,38 +16569,33 @@ function config (name) {
 /* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const SimplePeer = __webpack_require__(15);
 const $ = __webpack_require__(14);
 const openCamera = __webpack_require__(33);
+const createPeer = __webpack_require__(36);
+const setOnClick = __webpack_require__(37);
 const playFriendStream = __webpack_require__(34);
 
-const initOption = { initiator: location.hash === '#1', trickle: false };// eslint-disable-line
-
 $('document').ready(() => {
-    const peer = new SimplePeer(initOption);
-    peer.on('signal', data => $('#p-signal').html(JSON.stringify(data)));
-
-    $('#btnGetText').click(() => {
-        const id = $('#txtFriendId').val();
-        const obj = JSON.parse(id);
-        peer.signal(obj);
-    });  
-
-    $('#btnSend').click(() => {
-        peer.send(Math.random());
-    }); 
-    
-    $('#btnOpenCamera').click(() => openCamera());
-
-    peer.on('connect', () => console.log('CONNECTED'));
-
-    peer.on('data', (data) => {
-        console.log(`data: ${data}`);
+    $('#btnOpenCamera').click(() => {
+        openCamera()
+        .then(stream => {
+            const peer = createPeer(stream);
+            setOnClick(peer);
+            peer.on('signal', data => $('#p-signal').html(JSON.stringify(data)));
+            peer.on('connect', () => console.log('CONNECTED'));
+            peer.on('data', (data) => {
+                console.log(`data: ${data}`);
+            });
+            peer.on('stream', playFriendStream);
+        });
     });
-
-    peer.on('stream', playFriendStream);
 });
 
+// peer.on('data', (data) => {
+//     console.log(`data: ${data}`);
+// });
+
+// peer.on('stream', playFriendStream);
 
 
 /***/ }),
@@ -17117,12 +17112,47 @@ module.exports = playFriendStream;
 /***/ (function(module, exports) {
 
 const playMyStream = (stream) => {
-    const video = document.querySelectorAll('video')[1];// eslint-disable-line
+    const video = document.querySelectorAll('video')[0];// eslint-disable-line
     video.src = window.URL.createObjectURL(stream);// eslint-disable-line
     video.play();
 };
 
 module.exports = playMyStream;
+
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const SimplePeer = __webpack_require__(15);
+
+const createPeer = stream => {
+    const initOption = { initiator: location.hash === '#1', trickle: false, stream };// eslint-disable-line
+    return new SimplePeer(initOption);
+};
+
+module.exports = createPeer;
+
+
+/***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const $ = __webpack_require__(14);
+
+const setOnClick = peer => {
+    $('#btnGetText').click(() => {
+        const id = $('#txtFriendId').val();
+        const obj = JSON.parse(id);
+        peer.signal(obj);
+    });  
+
+    $('#btnSend').click(() => {
+        peer.send(Math.random());
+    }); 
+};
+
+module.exports = setOnClick;
 
 
 /***/ })
